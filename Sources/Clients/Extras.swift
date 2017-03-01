@@ -19,3 +19,17 @@ extension Array where Element: JSONInitializable {
         self = elements
     }
 }
+
+extension Message {
+    public func json() throws -> JSON {
+        guard headers[.contentType]?.contains("application/json") == true else {
+            return JSON([:])
+        }
+
+        guard case .data(let bytes) = body else {
+            return JSON([:])
+        }
+
+        return try JSON(bytes: bytes)
+    }
+}
