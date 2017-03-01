@@ -38,7 +38,7 @@ extension Client {
             print("❌ \(Self.name) request failed.")
             print(res)
 
-            throw ClientsError.badResponse(res.status)
+            throw res.status
         }
         return res
     }
