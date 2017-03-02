@@ -14,32 +14,56 @@ extension Client {
     public func respond(
         to method: HTTP.Method,
         path: String,
-        _ json: JSON? = nil
+        _ content: RequestSerializable? = nil
     ) throws -> Response {
-        let newUri = URI(
-            scheme: client.scheme,
-            host: client.host,
-            port: client.port,
-            path: path
-        )
+        let request: Request
+        do {
+            let newUri = URI(
+                scheme: client.scheme,
+                host: client.host,
+                port: client.port,
+                path: path
+            )
 
-        let request = try Request(method: method, uri: newUri)
-        if let json = json {
-            request.body = .data(try json.serialize())
-            request.headers["Content-Type"] = "application/json"
+            request = try Request(
+                method: method,
+                uri: newUri
+            )
+            try content?.serialize(to: request)
+
+            if let jwt = jwt {
+                request.headers["Authorization"] = "Bearer \(try jwt.createToken())"
+            }
+        } catch {
+            throw ClientsError.createRequest(error)
         }
 
-        if let jwt = jwt {
-            request.headers["Authorization"] = "Bearer \(try jwt.createToken())"
+        let res: Response
+        do {
+            res = try client.respond(to: request)
+        } catch {
+            throw ClientsError.connect(error)
         }
 
-        let res = try client.respond(to: request)
         guard res.status.statusCode < 400  else {
             print("❌ \(Self.name) request failed.")
             print(res)
 
-            throw res.status
+            throw ClientsError.badResponse(res.status)
         }
+
         return res
+    }
+
+}
+
+public protocol RequestSerializable {
+    func serialize(to request: Request) throws
+}
+
+extension JSON: RequestSerializable {
+    public func serialize(to request: Request) throws {
+        request.body = .data(try serialize())
+        request.headers["Content-Type"] = "application/json"
     }
 }
