@@ -25,7 +25,7 @@ extension Client {
                 path: path
             )
 
-            request = try Request(
+            request = Request(
                 method: method,
                 uri: newUri
             )
