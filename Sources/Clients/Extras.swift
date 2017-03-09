@@ -25,3 +25,5 @@ extension Message {
         return try JSON(bytes: bytes)
     }
 }
+
+extension Status: Error {}
