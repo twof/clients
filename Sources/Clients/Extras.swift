@@ -3,20 +3,12 @@ import HTTP
 
 extension Array where Element: JSONInitializable {
     public init(json: JSON) throws {
-        guard let raws = json.node.nodeArray else {
+        guard let array = json.typeArray else {
             self = []
             return
         }
 
-        var elements: [Element] = []
-
-        for raw in raws {
-            let json = try JSON(node: raw)
-            let element = try Element(json: json)
-            elements.append(element)
-        }
-
-        self = elements
+        self = try array.map { try Element(json: $0) }
     }
 }
 
