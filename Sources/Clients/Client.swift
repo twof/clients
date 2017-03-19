@@ -1,13 +1,15 @@
 import URI
-import HTTP
+import Vapor
 import JWT
 import JSON
+import HTTP
 
 public protocol Client {
     static var name: String { get }
+    var baseUri: URI { get }
     var jwt: JWT? { get }
     var client: ClientProtocol { get }
-    init(_ client: ClientProtocol, _ jwt: JWT?)
+    init(_ client: ClientProtocol, _ baseUri: URI, _ jwt: JWT?)
 }
 
 extension Client {
@@ -18,13 +20,7 @@ extension Client {
     ) throws -> Response {
         let request: Request
         do {
-            let newUri = URI(
-                scheme: client.scheme,
-                host: client.host,
-                port: client.port,
-                path: path
-            )
-
+            let newUri = baseUri.appendingPathComponent(path)
             request = Request(
                 method: method,
                 uri: newUri

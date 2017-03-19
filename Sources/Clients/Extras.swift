@@ -3,7 +3,7 @@ import HTTP
 
 extension Array where Element: JSONInitializable {
     public init(json: JSON) throws {
-        guard let array = json.typeArray else {
+        guard let array = json.array else {
             self = []
             return
         }
@@ -25,5 +25,3 @@ extension Message {
         return try JSON(bytes: bytes)
     }
 }
-
-extension Status: Error {}

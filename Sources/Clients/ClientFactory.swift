@@ -1,6 +1,7 @@
 import URI
 import HTTP
 import JWT
+import Vapor
 
 public final class ClientFactory<C: Client> {
     public let baseUri: URI
@@ -26,13 +27,21 @@ public final class ClientFactory<C: Client> {
 
     public func makeClient(using jwt: JWT? = nil) throws -> C {
         let client = try clientType.init(
-            scheme: baseUri.scheme,
-            host: baseUri.host,
+            hostname: baseUri.hostname,
             port: baseUri.port ?? 443,
-            securityLayer: baseUri.scheme.securityLayer,
-            middleware: []
+            baseUri.scheme.securityLayer()
         )
 
-        return C.init(client, jwt)
+        return C.init(client, baseUri, jwt)
+    }
+}
+
+extension String {
+    func securityLayer() throws -> SecurityLayer {
+        if isSecure {
+            return .tls(try EngineClient.defaultTLSContext())
+        } else {
+            return .none
+        }
     }
 }
