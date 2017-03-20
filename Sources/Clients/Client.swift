@@ -18,17 +18,17 @@ extension Client {
         path: String,
         _ content: RequestSerializable? = nil
     ) throws -> Response {
-        let request: Request
+        let req: Request
         do {
             let newUri = baseUri.appendingPathComponent(path)
-            request = Request(
+            req = Request(
                 method: method,
                 uri: newUri
             )
-            try content?.serialize(to: request)
+            try content?.serialize(to: req)
 
             if let jwt = jwt {
-                request.headers["Authorization"] = "Bearer \(try jwt.createToken())"
+                req.headers["Authorization"] = "Bearer \(try jwt.createToken())"
             }
         } catch {
             throw ClientsError.createRequest(error)
@@ -36,13 +36,14 @@ extension Client {
 
         let res: Response
         do {
-            res = try client.respond(to: request)
+            res = try client.respond(to: req)
         } catch {
             throw ClientsError.connect(error)
         }
 
         guard res.status.statusCode < 400  else {
             print("❌ \(Self.name) request failed.")
+            print(req)
             print(res)
 
             throw ClientsError.badResponse(res.status)
