@@ -10,6 +10,6 @@ let package = Package(
         .Package(url: "https://github.com/vapor/vapor.git", Version(2,0,0, prereleaseIdentifiers: ["beta"])),
 
         // JSON Web Tokens in Swift by @siemensikkema.
-        .Package(url: "https://github.com/vapor/jwt.git", majorVersion: 0)
+        .Package(url: "https://github.com/vapor/jwt.git", Version(2,0,0, prereleaseIdentifiers: ["beta"]))
     ] 
 )
