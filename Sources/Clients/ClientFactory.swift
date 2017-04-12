@@ -5,11 +5,11 @@ import Vapor
 
 public final class ClientFactory<C: Client> {
     public let baseUri: URI
-    public let clientType: Vapor.ClientFactory
+    public let clientType: ClientFactoryProtocol
 
     public init(
         _ baseUri: URI,
-        _ clientType: Vapor.ClientFactory,
+        _ clientType: ClientFactoryProtocol,
         _ apiType: C.Type = C.self
     ) {
         self.baseUri = baseUri
@@ -18,7 +18,7 @@ public final class ClientFactory<C: Client> {
 
     public convenience init(
         baseUrl: String,
-        _ clientType: Vapor.ClientFactory,
+        _ clientType: ClientFactoryProtocol,
         _ apiType: C.Type = C.self
     ) throws {
         let uri = try URI(baseUrl)
@@ -39,7 +39,7 @@ public final class ClientFactory<C: Client> {
 extension String {
     func securityLayer() throws -> SecurityLayer {
         if isSecure {
-            return .tls(try EngineClientFactory.defaultTLSContext())
+            return .tls(try EngineClient.defaultTLSContext())
         } else {
             return .none
         }
