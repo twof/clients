@@ -5,11 +5,11 @@ import Vapor
 
 public final class ClientFactory<C: Client> {
     public let baseUri: URI
-    public let clientType: ClientProtocol.Type
+    public let clientType: Vapor.ClientFactory
 
     public init(
         _ baseUri: URI,
-        _ clientType: ClientProtocol.Type,
+        _ clientType: Vapor.ClientFactory,
         _ apiType: C.Type = C.self
     ) {
         self.baseUri = baseUri
@@ -18,7 +18,7 @@ public final class ClientFactory<C: Client> {
 
     public convenience init(
         baseUrl: String,
-        _ clientType: ClientProtocol.Type,
+        _ clientType: Vapor.ClientFactory,
         _ apiType: C.Type = C.self
     ) throws {
         let uri = try URI(baseUrl)
@@ -26,7 +26,7 @@ public final class ClientFactory<C: Client> {
     }
 
     public func makeClient(using jwt: JWT? = nil) throws -> C {
-        let client = try clientType.init(
+        let client = try clientType.makeClient(
             hostname: baseUri.hostname,
             port: baseUri.port ?? 443,
             baseUri.scheme.securityLayer()
@@ -39,7 +39,7 @@ public final class ClientFactory<C: Client> {
 extension String {
     func securityLayer() throws -> SecurityLayer {
         if isSecure {
-            return .tls(try EngineClient.defaultTLSContext())
+            return .tls(try EngineClientFactory.defaultTLSContext())
         } else {
             return .none
         }

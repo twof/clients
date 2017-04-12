@@ -8,8 +8,8 @@ public protocol Client {
     static var name: String { get }
     var baseUri: URI { get }
     var jwt: JWT? { get }
-    var client: ClientProtocol { get }
-    init(_ client: ClientProtocol, _ baseUri: URI, _ jwt: JWT?)
+    var client: Responder { get }
+    init(_ client: Responder, _ baseUri: URI, _ jwt: JWT?)
 }
 
 extension Client {
