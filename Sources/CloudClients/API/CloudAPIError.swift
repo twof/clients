@@ -1,14 +1,16 @@
 import HTTP
 
-public enum ClientsError: Error {
+public enum CloudAPIError: Error {
     case createRequest(Error)
     case connect(Error)
     case badResponse(Status)
+    case middlewareNotConfigured
+    case invalidJSON
 }
 
 import Debugging
 
-extension ClientsError: Debuggable {
+extension CloudAPIError: Debuggable {
     public var reason: String {
         switch self {
         case .createRequest(let error):
@@ -17,6 +19,10 @@ extension ClientsError: Debuggable {
             return "Could not connect to the remote API: \(error)"
         case .badResponse(let status):
             return "Received a bad response status code: \(status)"
+        case .middlewareNotConfigured:
+            return "Cloud API middleware is not properly configured"
+        case .invalidJSON:
+            return "Invalid JSON response from Cloud API"
         }
     }
 
@@ -28,6 +34,10 @@ extension ClientsError: Debuggable {
             return "connect"
         case .badResponse(let status):
             return "badResponse.\(status.statusCode)"
+        case .middlewareNotConfigured:
+            return "middlewareNotConfigured"
+        case .invalidJSON:
+            return "middlewareNotConfigured"
         }
     }
 
@@ -48,6 +58,8 @@ extension ClientsError: Debuggable {
                 "Incorrect content was sent to the remote API",
                 "The remote API is currently not available"
             ]
+        default:
+            return []
         }
     }
 

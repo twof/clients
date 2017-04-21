@@ -7,21 +7,25 @@ extension Array where Element: JSONInitializable {
             self = []
             return
         }
-
+        
         self = try array.map { try Element(json: $0) }
     }
 }
 
 extension Message {
-    public func json() throws -> JSON {
+    public func assertJSON() throws -> JSON {
         guard headers[.contentType]?.contains("application/json") == true else {
-            return JSON([:])
+            throw CloudAPIError.invalidJSON
         }
-
+        
         guard case .data(let bytes) = body else {
-            return JSON([:])
+            throw CloudAPIError.invalidJSON
         }
-
-        return try JSON(bytes: bytes)
+        
+        do {
+            return try JSON(bytes: bytes)
+        } catch {
+            throw CloudAPIError.invalidJSON
+        }
     }
 }

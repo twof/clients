@@ -1,9 +1,9 @@
 import PackageDescription
 
 let package = Package(
-    name: "Clients",
+    name: "CloudClient",
     dependencies: [
-        // Conveniences for working with models.
+        // Vapor Cloud models.
         .Package(url: "git@github.com:vapor-cloud/models.git", majorVersion: 0),
 
         // HTTP, WebSockets, Streams, SMTP, etc.
