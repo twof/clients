@@ -1,7 +1,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "CloudClient",
+    name: "CloudClients",
     dependencies: [
         // Vapor Cloud models.
         .Package(url: "git@github.com:vapor-cloud/models.git", majorVersion: 0),
