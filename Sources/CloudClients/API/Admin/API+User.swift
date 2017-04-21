@@ -66,6 +66,8 @@ extension CloudAPI {
         return try User(json: res.assertJSON())
     }
     
+    // MARK: Projs / Orgs
+    
     public func users(for project: Project) throws -> [User] {
         let req = try makeRequest(.get, path: "admin", "projects", project.id, "users")
         let res = try respond(to: req)
@@ -78,5 +80,33 @@ extension CloudAPI {
         let res = try respond(to: req)
         
         return try [User](json: res.assertJSON())
+    }
+    
+    // MARK: Prefs
+    
+    public func preferences(for user: User) throws -> [String: String] {
+        let req = try makeRequest(.get, path: "admin", "users", "me", "preferences")
+        let res = try respond(to: req)
+        return try res.assertJSON().get(".")
+    }
+    
+    public func modifyPreferences(_ preferences: [String: String], for user: User) throws -> [String: String] {
+        let req = try makeRequest(.patch, path: "admin", "users", "me", "preferences")
+        req.json = try JSON(node: preferences)
+        let res = try respond(to: req)
+        return try res.assertJSON().get(".")
+    }
+    
+    public func replacePreferences(_ preferences: [String: String], for user: User) throws -> [String: String] {
+        let req = try makeRequest(.put, path: "admin", "users", "me", "preferences")
+        req.json = try JSON(node: preferences)
+        let res = try respond(to: req)
+        return try res.assertJSON().get(".")
+    }
+    
+    public func deletePreferences(_ preferences: [String], for user: User) throws {
+        let req = try makeRequest(.delete, path: "admin", "users", "me", "preferences")
+        req.json = try JSON(node: preferences)
+        _ = try respond(to: req)
     }
 }
