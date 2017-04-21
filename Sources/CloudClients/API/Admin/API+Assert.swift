@@ -5,7 +5,7 @@ extension CloudAPI {
         can required: ProjectPermission,
         project: ModelOrIdentifier<Project>
     ) throws {
-        let permissions = try self.permissions(for: project)
+        let permissions = try self.permissions(for: project, userId: Identifier("me"))
 
         var found = false
 
@@ -25,7 +25,7 @@ extension CloudAPI {
         can required: OrganizationPermission,
         organization: ModelOrIdentifier<Organization>
     ) throws {
-        let permissions = try self.permissions(for: organization)
+        let permissions = try self.permissions(for: organization, userId: Identifier("me"))
         
         var found = false
         

@@ -1,7 +1,7 @@
 extension CloudAPI {
     /// Index
     public func projects() throws -> [Project] {
-        let req = try makeRequest(.get, path: "projects")
+        let req = try makeRequest(.get, path: "admin", "projects")
         let res = try respond(to: req)
         return try [Project](
             json: res.assertJSON().get("data")
@@ -10,7 +10,7 @@ extension CloudAPI {
 
     /// Show
     public func project(withId projectId: Identifier) throws -> Project {
-        let req = try makeRequest(.get, path: "projects", projectId)
+        let req = try makeRequest(.get, path: "admin", "projects", projectId)
         let res = try respond(to: req)
         return try Project(
             json: res.assertJSON()
@@ -20,7 +20,7 @@ extension CloudAPI {
     /// Store
     public func create(_ project: Project) throws -> Project {
         let orgId = try project.organization.assertIdentifier()
-        let req = try makeRequest(.post, path: "organizations", orgId, "projects")
+        let req = try makeRequest(.post, path: "admin", "organizations", orgId, "projects")
         req.json = try project.makeJSON()
         
         let res = try respond(to: req)

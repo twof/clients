@@ -15,6 +15,7 @@ public final class CloudAPIMiddleware: Middleware {
     }
 }
 
+// MARK: HTTP
 
 extension Request {
     public func cloudAPIFactory() throws -> CloudAPIFactory {
@@ -22,5 +23,24 @@ extension Request {
             throw CloudAPIError.middlewareNotConfigured
         }
         return factory
+    }
+}
+
+// MARK: Config
+
+extension CloudAPIMiddleware: ConfigInitializable {
+    public convenience init(config: Config) throws {
+        guard let cloud = config["cloud"] else {
+            throw ConfigError.missingFile("cloud")
+        }
+        
+        guard let url = cloud["url"]?.string else {
+            throw ConfigError.missing(key: ["url"], file: "cloud", desiredType: String.self)
+        }
+        
+        let client = try config.resolveClient()
+        let factory = try CloudAPIFactory(baseURL: url, client)
+        
+        self.init(factory)
     }
 }

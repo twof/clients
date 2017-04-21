@@ -1,4 +1,5 @@
 import HTTP
+import JWT
 
 extension CloudAPI {
     public func createUser(
@@ -11,7 +12,7 @@ extension CloudAPI {
         try json.set("email", email)
         try json.set("password", password)
         
-        let req = try makeRequest(.post, path: "users")
+        let req = try makeRequest(.post, path: "admin", "users")
         req.json = json
 
         let res = try respond(to: req)
@@ -22,7 +23,7 @@ extension CloudAPI {
         email: String,
         password: String
     ) throws -> (
-        accessToken: String,
+        accessToken: JWT,
         refreshToken: String
     ) {
         let res: Response
@@ -31,7 +32,7 @@ extension CloudAPI {
             try json.set("email", email)
             try json.set("password", password)
             
-            let req = try makeRequest(.post, path: "login")
+            let req = try makeRequest(.post, path: "admin", "login")
             req.json = json
             
             res = try respond(to: req)
@@ -47,6 +48,35 @@ extension CloudAPI {
             throw Status.internalServerError
         }
 
-        return (accessToken, refreshToken)
+        let jwt = try JWT(token: accessToken)
+        return (jwt, refreshToken)
+    }
+    
+    public func refresh(withToken refreshToken: String) throws -> JWT {
+        let req = try makeRequest(.get, path: "admin", "refresh")
+        req.headers[.authorization] = "Bearer \(refreshToken)"
+        
+        let res = try respond(to: req)
+        return try JWT(token: res.assertJSON().get("accessToken"))
+    }
+    
+    public func user(withId userId: Identifier = Identifier("me")) throws -> User {
+        let req = try makeRequest(.get, path: "admin", "users", userId)
+        let res = try respond(to: req)
+        return try User(json: res.assertJSON())
+    }
+    
+    public func users(for project: Project) throws -> [User] {
+        let req = try makeRequest(.get, path: "admin", "projects", project.id, "users")
+        let res = try respond(to: req)
+        
+        return try [User](json: res.assertJSON())
+    }
+    
+    public func users(for org: Organization) throws -> [User] {
+        let req = try makeRequest(.get, path: "admin", "organizations", org.id, "users")
+        let res = try respond(to: req)
+        
+        return try [User](json: res.assertJSON())
     }
 }

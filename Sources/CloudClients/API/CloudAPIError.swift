@@ -3,7 +3,7 @@ import HTTP
 public enum CloudAPIError: Error {
     case createRequest(Error)
     case connect(Error)
-    case badResponse(Status)
+    case badResponse(AbortError)
     case middlewareNotConfigured
     case invalidJSON
 }
@@ -32,8 +32,8 @@ extension CloudAPIError: Debuggable {
             return "createRequest"
         case .connect:
             return "connect"
-        case .badResponse(let status):
-            return "badResponse.\(status.statusCode)"
+        case .badResponse(let error):
+            return "badResponse.\(error.status.statusCode)"
         case .middlewareNotConfigured:
             return "middlewareNotConfigured"
         case .invalidJSON:
