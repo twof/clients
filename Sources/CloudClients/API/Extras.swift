@@ -29,3 +29,5 @@ extension Message {
         }
     }
 }
+
+public typealias Environment = CloudModels.Environment
