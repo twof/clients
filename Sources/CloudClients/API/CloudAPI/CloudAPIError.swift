@@ -3,9 +3,14 @@ import HTTP
 public enum CloudAPIError: Error {
     case createRequest(Error)
     case connect(Error)
-    case badResponse(AbortError)
+    case badResponse(ResponseError)
     case middlewareNotConfigured
     case invalidJSON
+}
+
+public struct ResponseError {
+    public let status: Status
+    public let reason: String
 }
 
 import Debugging

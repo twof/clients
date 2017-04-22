@@ -23,8 +23,8 @@ extension CloudAPI {
         email: String,
         password: String
     ) throws -> (
-        accessToken: JWT,
-        refreshToken: String
+        accessToken: AccessToken,
+        refreshToken: RefreshToken
     ) {
         let res: Response
         do {
@@ -48,16 +48,20 @@ extension CloudAPI {
             throw Status.internalServerError
         }
 
-        let jwt = try JWT(token: accessToken)
-        return (jwt, refreshToken)
+        return try (
+            AccessToken(string: accessToken),
+            RefreshToken(string: refreshToken)
+        )
     }
     
-    public func refresh(withToken refreshToken: String) throws -> JWT {
+    public func refresh(with refreshToken: RefreshToken) throws -> AccessToken {
         let req = try makeRequest(.get, path: "admin", "refresh")
         req.headers[.authorization] = "Bearer \(refreshToken)"
         
         let res = try respond(to: req)
-        return try JWT(token: res.assertJSON().get("accessToken"))
+        return try AccessToken(
+            string: res.assertJSON().get("accessToken")
+        )
     }
     
     public func user(withId userId: Identifier = Identifier("me")) throws -> User {

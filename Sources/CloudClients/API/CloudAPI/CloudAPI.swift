@@ -5,14 +5,18 @@ import URI
 
 // MARK: Client
 public final class CloudAPI {
-    public let jwt: JWT?
+    public let accessTokenFactory: AccessTokenFactory?
     public let baseURI: URI
     public let client: ClientProtocol
     
-    public init(_ client: ClientProtocol, _ baseURI: URI, _ jwt: JWT?) {
+    public init(
+        _ client: ClientProtocol,
+        _ baseURI: URI,
+        _ accessTokenFactory: AccessTokenFactory?
+    ) {
         self.client = client
         self.baseURI = baseURI
-        self.jwt = jwt
+        self.accessTokenFactory = accessTokenFactory
     }
 }
 
@@ -29,8 +33,16 @@ extension CloudAPI: Responder {
             print("❌ Cloud API request failed.")
             print(req)
             print(res)
-            
-            throw CloudAPIError.badResponse(res.status)
+
+            let reason = res.json?["reason"]?.string
+                ?? res.status.reason
+
+            let error = ResponseError(
+                status: res.status,
+                reason: reason
+            )
+
+            throw CloudAPIError.badResponse(error)
         }
         
         return res
@@ -48,8 +60,9 @@ extension CloudAPI: Responder {
         let uri = baseURI.appendingPathComponent(path)
         let req = Request(method: method, uri: uri)
         do {
-            if let jwt = jwt {
-                req.headers["Authorization"] = "Bearer \(try jwt.createToken())"
+            if let factory = accessTokenFactory {
+                let token = try factory.makeAccessToken()
+                req.headers["Authorization"] = "Bearer \(try token.makeString())"
             }
         } catch {
             throw CloudAPIError.createRequest(error)

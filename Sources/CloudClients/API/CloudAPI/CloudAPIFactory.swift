@@ -23,13 +23,15 @@ public final class CloudAPIFactory {
         self.init(uri, clientType)
     }
 
-    public func makeClient(using jwt: JWT? = nil) throws -> CloudAPI {
+    public func makeClient(
+        using accessTokenFactory: AccessTokenFactory? = nil
+    ) throws -> CloudAPI {
         let client = try clientType.makeClient(
             hostname: baseURI.hostname,
             port: baseURI.port ?? 443,
             baseURI.scheme.securityLayer()
         )
-        return CloudAPI(client, baseURI, jwt)
+        return CloudAPI(client, baseURI, accessTokenFactory)
     }
 }
 
