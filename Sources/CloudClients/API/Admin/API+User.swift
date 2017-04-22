@@ -56,7 +56,7 @@ extension CloudAPI {
     
     public func refresh(with refreshToken: RefreshToken) throws -> AccessToken {
         let req = try makeRequest(.get, path: "admin", "refresh")
-        req.headers[.authorization] = "Bearer \(refreshToken)"
+        req.headers[.authorization] = "Bearer \(refreshToken.makeString())"
         
         let res = try respond(to: req)
         return try AccessToken(
