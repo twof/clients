@@ -18,14 +18,15 @@ public struct AccessToken {
     }
 
     public var expirationDate: Date {
-        guard let date = jwt.headers["exp"]?.double else {
+        guard let date = jwt.payload["exp"]?.double else {
             return Date()
         }
         return Date(timeIntervalSince1970: date)
     }
 
     public var isExpired: Bool {
-        let now = Date()
+        // check slightly ahead
+        let now = Date(timeIntervalSinceNow: 5)
         switch expirationDate.compare(now) {
         case .orderedAscending, .orderedSame:
             return true
