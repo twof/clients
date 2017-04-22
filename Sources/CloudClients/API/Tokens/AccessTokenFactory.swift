@@ -6,15 +6,18 @@ public final class AccessTokenFactory {
 
     var currentAccessToken: AccessToken?
     let cloudFactory: CloudAPIFactory
+    let onRefresh: (AccessToken) throws -> ()
 
     public init(
         _ refreshToken: RefreshToken,
         _ cloudFactory: CloudAPIFactory,
-        current: AccessToken? = nil
+        current: AccessToken? = nil,
+        onRefresh: @escaping (AccessToken) throws -> () = { _ in }
     ) {
         self.refreshToken = refreshToken
         self.cloudFactory = cloudFactory
         self.currentAccessToken = current
+        self.onRefresh = onRefresh
     }
 
     public func makeAccessToken() throws -> AccessToken {
@@ -23,6 +26,8 @@ public final class AccessTokenFactory {
                 .makeClient()
                 .refresh(with: refreshToken)
 
+            try onRefresh(accessToken)
+
             currentAccessToken = accessToken
             return accessToken
         }
@@ -30,4 +35,3 @@ public final class AccessTokenFactory {
         return accessToken
     }
 }
-
