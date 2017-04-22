@@ -3,12 +3,13 @@ import HTTP
 public enum CloudAPIError: Error {
     case createRequest(Error)
     case connect(Error)
-    case badResponse(ResponseError)
     case middlewareNotConfigured
     case invalidJSON
+    case noRefreshToken
+    case refreshTokenExpired
 }
 
-public struct ResponseError {
+public struct ResponseError: AbortError {
     public let status: Status
     public let reason: String
 }
@@ -22,12 +23,14 @@ extension CloudAPIError: Debuggable {
             return "Could not create the request: \(error)"
         case .connect(let error):
             return "Could not connect to the remote API: \(error)"
-        case .badResponse(let status):
-            return "Received a bad response status code: \(status)"
         case .middlewareNotConfigured:
             return "Cloud API middleware is not properly configured"
         case .invalidJSON:
             return "Invalid JSON response from Cloud API"
+        case .noRefreshToken:
+            return "No cached refresh token was found"
+        case .refreshTokenExpired:
+            return "The refresh token has expired"
         }
     }
 
@@ -37,12 +40,14 @@ extension CloudAPIError: Debuggable {
             return "createRequest"
         case .connect:
             return "connect"
-        case .badResponse(let error):
-            return "badResponse.\(error.status.statusCode)"
         case .middlewareNotConfigured:
             return "middlewareNotConfigured"
         case .invalidJSON:
             return "middlewareNotConfigured"
+        case .noRefreshToken:
+            return "noRefreshToken"
+        case .refreshTokenExpired:
+            return "refreshTokenExpired"
         }
     }
 
@@ -58,17 +63,17 @@ extension CloudAPIError: Debuggable {
                 "The URL used is invalid",
                 "The remote API is currently not available"
             ]
-        case .badResponse:
-            return [
-                "Incorrect content was sent to the remote API",
-                "The remote API is currently not available"
-            ]
         default:
             return []
         }
     }
 
     public var suggestedFixes: [String] {
-        return []
+        switch self {
+        case .refreshTokenExpired:
+            return ["Login again"]
+        default:
+            return []
+        }
     }
 }

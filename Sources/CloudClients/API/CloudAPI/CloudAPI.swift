@@ -41,8 +41,8 @@ extension CloudAPI: Responder {
                 status: res.status,
                 reason: reason
             )
-
-            throw CloudAPIError.badResponse(error)
+            
+            throw error
         }
         
         return res

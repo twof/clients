@@ -2,33 +2,43 @@
 /// Refresh token will be used to regenerate
 /// expired access tokens automatically.
 public final class AccessTokenFactory {
-    public let refreshToken: RefreshToken
+    public let cloudFactory: CloudAPIFactory
+    public let tokenCache: TokenCache
 
-    var currentAccessToken: AccessToken?
-    let cloudFactory: CloudAPIFactory
-    let onRefresh: (AccessToken) throws -> ()
+    let refreshToken: RefreshToken
+    var accessToken: AccessToken?
 
     public init(
-        _ refreshToken: RefreshToken,
-        _ cloudFactory: CloudAPIFactory,
-        current: AccessToken? = nil,
-        onRefresh: @escaping (AccessToken) throws -> () = { _ in }
-    ) {
-        self.refreshToken = refreshToken
+        _ tokenCache: TokenCache,
+        _ cloudFactory: CloudAPIFactory
+    ) throws {
+        self.tokenCache = tokenCache
         self.cloudFactory = cloudFactory
-        self.currentAccessToken = current
-        self.onRefresh = onRefresh
+
+        // retrieve cached tokens
+        guard let refresh = try tokenCache.getRefreshToken() else {
+            throw CloudAPIError.noRefreshToken
+        }
+        self.refreshToken = refresh
+        self.accessToken = try tokenCache.getAccessToken()
     }
 
     public func makeAccessToken() throws -> AccessToken {
-        guard let accessToken = currentAccessToken, !accessToken.isExpired else {
-            let accessToken = try cloudFactory
-                .makeClient()
-                .refresh(with: refreshToken)
+        guard let accessToken = self.accessToken, !accessToken.isExpired else {
+            let accessToken: AccessToken
+            do {
+                accessToken = try cloudFactory
+                    .makeClient()
+                    .refresh(with: refreshToken)
+            } catch let error as AbortError where error.status == .forbidden {
+                // this refresh token is expired
+                try tokenCache.setAccessToken(nil)
+                try tokenCache.setRefreshToken(nil)
+                throw CloudAPIError.refreshTokenExpired
+            }
 
-            try onRefresh(accessToken)
-
-            currentAccessToken = accessToken
+            try tokenCache.setAccessToken(accessToken)
+            self.accessToken = accessToken
             return accessToken
         }
 
