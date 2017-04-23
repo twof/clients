@@ -5,10 +5,18 @@ extension CloudAPI {
         return try Application(json: res.assertJSON())
     }
     
-    public func applications(projectId: Identifier) throws -> [Application] {
+    public func applications(
+        projectId: Identifier? = nil,
+        gitURL: String? = nil
+    ) throws -> [Application] {
         let req = try makeRequest(.get, path: "application", "applications")
         var json = JSON()
-        try json.set("projectId", projectId)
+        if let projectId = projectId {
+            try json.set("projectId", projectId)
+        }
+        if let gitURL = gitURL {
+            try json.set("hosting:gitUrl", gitURL)
+        }
         req.json = json
         
         let res = try respond(to: req)
