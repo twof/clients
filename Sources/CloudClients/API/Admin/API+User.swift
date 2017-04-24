@@ -5,12 +5,22 @@ extension CloudAPI {
     public func createUser(
         name: Name,
         email: String,
-        password: String
+        password: String,
+        organizationName: String? = nil,
+        inviteToken: JWT? = nil
     ) throws -> User {
         var json = JSON([:])
         try json.set("name", name.makeJSON())
         try json.set("email", email)
         try json.set("password", password)
+        
+        if let name = organizationName {
+            try json.set("organization.name", name)
+        }
+        
+        if let inviteToken = inviteToken {
+            try json.set("inviteToken", inviteToken.createToken())
+        }
         
         let req = try makeRequest(.post, path: "admin", "users")
         req.json = json
@@ -68,6 +78,21 @@ extension CloudAPI {
         let req = try makeRequest(.get, path: "admin", "users", userId)
         let res = try respond(to: req)
         return try User(json: res.assertJSON())
+    }
+    
+    public func user(withEmail email: String) throws -> User? {
+        let _req = try makeRequest(.get, path: "admin", "users")
+        var uri = _req.uri
+        uri.query = "email=\(email)"
+        let req = Request(method: .get, uri: uri)
+        req.headers = _req.headers
+        
+        do  {
+            let res = try respond(to: req)
+            return try User(json: res.assertJSON())
+        } catch let error as AbortError where error.status == .notFound {
+            return nil
+        }
     }
     
     // MARK: Projs / Orgs

@@ -102,6 +102,26 @@ extension CloudAPI {
             keysJSON: res.assertJSON()
         )
     }
+    
+    // MARK: Invite
+    
+    public func invite(
+        email: String,
+        to project: ModelOrIdentifier<Project>,
+        onAccept acceptURL: String,
+        with permissions: [ProjectPermission]? = nil
+    ) throws {
+        let req = try makeRequest(.post, path: "admin", "users", "invite")
+        var json = JSON()
+        try json.set("project.id", project.getIdentifier())
+        if let permissions = permissions {
+            try json.set("project.permissions", permissions.makeKeysJSON())
+        }
+        try json.set("email", email)
+        try json.set("acceptURL", acceptURL)
+        req.json = json
+        _ = try respond(to: req)
+    }
 }
 
 extension Identifier: Hashable {
