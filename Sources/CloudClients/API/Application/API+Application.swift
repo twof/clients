@@ -22,4 +22,11 @@ extension CloudAPI {
         let res = try respond(to: req)
         return try [Application](json: res.assertJSON().get("data"))
     }
+    
+    public func create(_ app: Application) throws -> Application {
+        let req = try makeRequest(.post, path: "application", "applications")
+        req.json = try app.makeJSON()
+        let res = try respond(to: req)
+        return try Application(json: res.assertJSON())
+    }
 }

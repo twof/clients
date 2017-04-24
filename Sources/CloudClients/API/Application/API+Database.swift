@@ -7,8 +7,7 @@ extension CloudAPI {
     
     public func create(
         _ database: Database,
-        for app: ModelOrIdentifier<Application>,
-        in env: ModelOrIdentifier<Environment>
+        for app: ModelOrIdentifier<Application>
     ) throws -> Database {
         let req = try makeRequest(.post, path:
             "application",
@@ -16,7 +15,7 @@ extension CloudAPI {
             app.getIdentifier(),
             "hosting",
             "environments",
-            env.getIdentifier(),
+            database.environment.getIdentifier(),
             "database"
         )
         req.json = try database.makeJSON()
