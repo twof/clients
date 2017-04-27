@@ -1,12 +1,16 @@
 extension CloudAPI {
     /// Index
     public func projects(
+        nameLike name: String? = nil,
         organization: ModelOrIdentifier<Organization>? = nil
     ) throws -> [Project] {
         let req = try makeRequest(.get, path: "admin", "projects")
         var json = JSON()
         if let org = organization {
             try json.set("organizationId", org.getIdentifier())
+        }
+        if let name = name {
+            try json.set("name", name)
         }
         req.json = json
         

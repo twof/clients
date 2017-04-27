@@ -7,7 +7,9 @@ extension CloudAPI {
     
     public func applications(
         projectId: Identifier? = nil,
-        gitURL: String? = nil
+        gitURL: String? = nil,
+        nameLike name: String? = nil,
+        repoNameLike repoName: String? = nil
     ) throws -> [Application] {
         let req = try makeRequest(.get, path: "application", "applications")
         var json = JSON()
@@ -16,6 +18,12 @@ extension CloudAPI {
         }
         if let gitURL = gitURL {
             try json.set("hosting:gitUrl", gitURL)
+        }
+        if let name = name {
+            try json.set("name", name)
+        }
+        if let repoName = repoName {
+            try json.set("repoName", repoName)
         }
         req.json = json
         
