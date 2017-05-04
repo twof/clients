@@ -30,9 +30,9 @@ extension CloudAPI: Responder {
         }
         
         guard res.status.statusCode < 400  else {
-            print("❌ Cloud API request failed.")
-            print(req)
-            print(res)
+//            print("❌ Cloud API request failed.")
+//            print(req)
+//            print(res)
 
             let reason = res.json?["reason"]?.string
                 ?? res.status.reason
