@@ -46,6 +46,11 @@ extension CloudAPI {
             json: res.assertJSON()
         )
     }
+    
+    public func destroy(_ project: ModelOrIdentifier<Project>) throws {
+        let req = try makeRequest(.delete, path: "admin", "projects", project.assertIdentifier())
+        _ = try respond(to: req)
+    }
 }
 
 
