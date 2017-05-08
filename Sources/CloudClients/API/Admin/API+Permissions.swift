@@ -94,6 +94,29 @@ extension CloudAPI {
         )
     }
     
+    public func replace(
+        _ permissions: [ProjectPermission],
+        for team: ModelOrIdentifier<Team>,
+        on project: ModelOrIdentifier<Project>
+    ) throws -> [ProjectPermission] {
+        let req = try makeRequest(
+            .put,
+            path:
+                "admin",
+                "teams",
+                team.assertIdentifier(),
+                "permissions",
+                "projects",
+                project.assertIdentifier()
+        )
+        
+        req.json = permissions.makeKeysJSON()
+        let res = try respond(to: req)
+        return try [ProjectPermission](
+            keysJSON: res.assertJSON()
+        )
+    }
+    
     public func replace(_ permissions: [OrganizationPermission], for user: User, on org: Organization) throws -> [OrganizationPermission] {
         let req = try makeRequest(.put, path: "admin", "users", user.id, "permissions", "organizations", org.id)
         req.json = permissions.makeKeysJSON()
