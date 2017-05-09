@@ -47,6 +47,15 @@ extension CloudAPI {
         )
     }
     
+    public func update(_ proj: Project) throws -> Project {
+        let req = try makeRequest(.patch, path: "admin", "projects", proj.assertIdentifier())
+        req.json = try proj.makeJSON()
+        let res = try respond(to: req)
+        return try Project(
+            json: res.assertJSON()
+        )
+    }
+    
     public func destroy(_ project: ModelOrIdentifier<Project>) throws {
         let req = try makeRequest(.delete, path: "admin", "projects", project.assertIdentifier())
         _ = try respond(to: req)

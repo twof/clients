@@ -6,7 +6,7 @@ extension CloudAPI {
     }
     
     public func applications(
-        projectId: Identifier? = nil,
+        projectId: Identifier,
         nameLike name: String? = nil,
         repoNameLike repoName: String? = nil,
         page: Int? = nil,
@@ -20,9 +20,7 @@ extension CloudAPI {
         if let size = size {
             try json.set("size", size)
         }
-        if let projectId = projectId {
-            try json.set("projectId", projectId)
-        }
+        try json.set("projectId", projectId)
         if let name = name {
             try json.set("name", name)
         }
