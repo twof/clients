@@ -48,4 +48,15 @@ extension CloudAPI {
         let res = try respond(to: req)
         return try Database(json: res.assertJSON())
     }
+    
+    public func makePMAUrl(
+        for env: ModelOrIdentifier<Environment>,
+        on app: ModelOrIdentifier<Application>
+    ) throws -> String? {
+        guard let token = try accessTokenFactory?.makeAccessToken() else {
+            return nil
+        }
+        
+        return try "\(baseURI)/application/applications/\(app.assertIdentifier())/hosting/environments/\(env.assertIdentifier())/database/pma?_authorizationBearer=\(token.makeString())"
+    }
 }

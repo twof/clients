@@ -29,7 +29,7 @@ public final class CloudAPIFactory {
         let client = try clientType.makeClient(
             hostname: baseURI.hostname,
             port: baseURI.port ?? 443,
-            baseURI.scheme.securityLayer()
+            securityLayer: baseURI.scheme.securityLayer()
         )
         return CloudAPI(client, baseURI, accessTokenFactory)
     }
