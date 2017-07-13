@@ -138,4 +138,24 @@ extension CloudAPI {
         req.json = try JSON(node: preferences)
         _ = try respond(to: req)
     }
+    
+    // MARK: Password Reset
+    
+    public func requestPasswordReset(for email: String, acceptURL: String) throws {
+        let req = try makeRequest(.post, path: "admin", "passwords", "resets")
+        req.json = try JSON(node: [
+            "email": email,
+            "acceptURL": acceptURL
+        ])
+        _ = try respond(to: req)
+    }
+    
+    public func resetPassword(to password: String, using token: String) throws {
+        let req = try makeRequest(.post, path: "admin", "passwords")
+        req.json = try JSON(node: [
+            "password": password,
+            "token": token
+        ])
+        _ = try respond(to: req)
+    }
 }
