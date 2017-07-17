@@ -19,4 +19,20 @@ extension CloudAPI {
         let res = try respond(to: req)
         return try Hosting(json: res.assertJSON())
     }
+
+    public func update(
+        _ hosting: Hosting
+    ) throws -> Hosting {
+        let req = try makeRequest(
+            .patch,
+            path:
+                "application",
+                "applications",
+                hosting.application.getIdentifier(),
+                "hosting"
+        )
+        req.json = try hosting.makeJSON()
+        let res = try respond(to: req)
+        return try Hosting(json: res.assertJSON())
+    }
 }
