@@ -60,4 +60,41 @@ extension CloudAPI {
             Deployment(json: res.get("deployment"))
         )
     }
+
+    public func update(
+        _ env: Environment,
+        for app: ModelOrIdentifier<Application>
+    ) throws -> Environment {
+        let req = try makeRequest(
+            .patch,
+            path:
+            "application",
+            "applications",
+            app.getIdentifier(),
+            "hosting",
+            "environments",
+            env.id
+        )
+
+        var json = JSON()
+        try json.set("defaultBranch", env.defaultBranch)
+        req.json = json
+
+        let res = try respond(to: req).assertJSON()
+        return try Environment(json: res)
+    }
+
+    public func delete(_ env: ModelOrIdentifier<Environment>, for app: ModelOrIdentifier<Application>) throws {
+        let req = try makeRequest(
+            .delete,
+            path:
+                "application",
+                "applications",
+                app.getIdentifier(),
+                "hosting",
+                "environments",
+                env.getIdentifier()
+        )
+        _ = try respond(to: req)
+    }
 }

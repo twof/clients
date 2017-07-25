@@ -51,4 +51,16 @@ extension CloudAPI {
         let res = try respond(to: req)
         return try Application(json: res.assertJSON())
     }
+
+    public func update(_ app: Application) throws -> Application {
+        let req = try makeRequest(.patch, path: "application", "applications", app.assertIdentifier())
+        req.json = try app.makeJSON()
+        let res = try respond(to: req)
+        return try Application(json: res.assertJSON())
+    }
+
+    public func delete(_ app: Application) throws {
+        let req = try makeRequest(.delete, path: "application", "applications", app.assertIdentifier())
+        _ = try respond(to: req)
+    }
 }

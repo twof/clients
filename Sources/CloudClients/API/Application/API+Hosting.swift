@@ -35,4 +35,16 @@ extension CloudAPI {
         let res = try respond(to: req)
         return try Hosting(json: res.assertJSON())
     }
+
+    public func delete(_ hosting: Hosting) throws {
+        let req = try makeRequest(
+            .delete,
+            path:
+            "application",
+            "applications",
+            hosting.application.getIdentifier(),
+            "hosting"
+        )
+        _ = try respond(to: req)
+    }
 }

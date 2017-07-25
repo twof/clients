@@ -28,6 +28,22 @@ extension CloudAPI {
         let res = try respond(to: req)
         return try Cache(json: res.assertJSON())
     }
+
+    public func deleteCache(
+        on env: ModelOrIdentifier<Environment>,
+        for app: ModelOrIdentifier<Application>
+    ) throws {
+        let req = try makeRequest(.delete, path:
+            "application",
+            "applications",
+            app.getIdentifier(),
+            "hosting",
+            "environments",
+            env.getIdentifier(),
+            "cache"
+        )
+        let _ = try respond(to: req)
+    }
     
     public func create(
         _ cache: Cache,

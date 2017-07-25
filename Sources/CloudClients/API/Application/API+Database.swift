@@ -48,6 +48,22 @@ extension CloudAPI {
         let res = try respond(to: req)
         return try Database(json: res.assertJSON())
     }
+
+    public func deleteDatabase(
+        on env: ModelOrIdentifier<Environment>,
+        for app: ModelOrIdentifier<Application>
+    ) throws {
+        let req = try makeRequest(.delete, path:
+            "application",
+            "applications",
+            app.getIdentifier(),
+            "hosting",
+            "environments",
+            env.getIdentifier(),
+            "database"
+        )
+        let _ = try respond(to: req)
+    }
     
     public func makePMAUrl(
         for env: ModelOrIdentifier<Environment>,
