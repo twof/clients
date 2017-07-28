@@ -17,7 +17,7 @@ extension CloudAPI {
         }
 
         guard found else {
-            throw Status.unauthorized
+            throw Status.forbidden
         }
     }
     
@@ -37,7 +37,7 @@ extension CloudAPI {
         }
         
         guard found else {
-            throw Status.unauthorized
+            throw Status.forbidden
         }
     }
 }

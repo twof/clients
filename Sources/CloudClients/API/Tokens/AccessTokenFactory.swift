@@ -30,7 +30,7 @@ public final class AccessTokenFactory {
                 accessToken = try cloudFactory
                     .makeClient()
                     .refresh(with: refreshToken)
-            } catch let error as AbortError where error.status == .forbidden {
+            } catch let error as AbortError where error.status == .unauthorized {
                 // this refresh token is expired
                 try tokenCache.setAccessToken(nil)
                 try tokenCache.setRefreshToken(nil)
