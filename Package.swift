@@ -3,6 +3,9 @@ import PackageDescription
 
 let package = Package(
     name: "CloudClients",
+    products: [
+        .library(name: "CloudClients", targets: ["CloudClients"])
+    ],
     dependencies: [
         // Vapor Cloud models.
         .package(url: "https://github.com/twof/models.git", .branch("PackageUpgrade")),
